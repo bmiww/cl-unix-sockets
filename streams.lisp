@@ -4,7 +4,7 @@
                            fundamental-binary-output-stream)
   ((sock :initarg :sock :accessor sock)))
 
-(defmethod stream-element-type ((stream internal-stream)) 'integer)
+(defmethod stream-element-type ((stream internal-stream)) '(unsigned-byte 8))
 
 (defmethod stream-write-byte ((stream internal-stream) byte)
   (handler-bind ((error (lambda (e)
