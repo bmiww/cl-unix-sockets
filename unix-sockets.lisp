@@ -21,16 +21,19 @@
 socket IO code. Do not modify this. This is mainly used a means for
 testability.")
 
-(define-condition unix-socket-error (simple-error) ())
+(define-condition unix-socket-error (simple-error)
+  ((errno :initarg :errno :reader get-errno :initform 0)))
+
 
 (defmethod print-object ((e unix-socket-error) out)
-  (format out "unix-socket-error: ")
+  (format out "unix-socket-error: Error ~a: " (get-errno e))
   (call-next-method))
 
-(defun unix-socket-error (fmt &rest args)
+(defun unix-socket-error (errno &rest args)
   (error 'unix-socket-error
-         :format-string fmt
-         :format-arguments args))
+	 :format-control "~a"
+         :format-arguments args
+	 :errno errno))
 
 
 (defclass unix-socket ()
@@ -65,9 +68,7 @@ testability.")
 
 (defun throw-errno ()
   (let ((errno (errno)))
-    (unix-socket-error "Error: ~a: ~a"
-                       errno
-                       (strerror errno))))
+    (unix-socket-error errno (strerror errno))))
 
 (defun pcheck (e)
   (when (< e 0)
